@@ -33,7 +33,7 @@ def run_migration(migration_file):
     # Import the migration script dynamically
     spec = importlib.util.spec_from_file_location(
         migration_file, migration_path)
-    
+
     migration_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration_module)
 
@@ -42,3 +42,18 @@ def run_migration(migration_file):
         migration_module.migrate()
     else:
         print(f"Migration function not found in {migration_file}")
+
+
+def migrate():
+    import os
+
+    from services import MIGRATIONS_PATH, run_migration
+
+    migrations = os.listdir(MIGRATIONS_PATH)
+    print(f"Found migrations: {migrations}")
+
+    python_migrations = [
+        migration for migration in migrations if migration.endswith(".py")]
+    print(f"Running migrations: {python_migrations}")
+    tasks = [run_migration(migration)
+             for migration in python_migrations]

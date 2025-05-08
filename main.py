@@ -3,12 +3,14 @@ from fastapi import FastAPI
 from routers.todo import router as todo_router
 from config.settings import lifespan
 
+from services import migrate
+
 app = FastAPI(debug=False, lifespan=lifespan)
 app.include_router(todo_router, prefix="/tasks")
 
 if __name__ == "__main__":
     from uvicorn import run
-
+    import sys
     if len(sys.argv) > 1:
         arguments = sys.argv[1:]
         for arg in arguments:
@@ -16,19 +18,7 @@ if __name__ == "__main__":
                 case "run":
                     run("main:app", host="127.0.0.1", port=8000, reload=True)
                 case "migrate":
-                    import sys
-                    import os
-
-                    from services import MIGRATIONS_PATH, run_migration
-
-                    migrations = os.listdir(MIGRATIONS_PATH)
-                    print(f"Found migrations: {migrations}")
-
-                    python_migrations = [
-                        migration for migration in migrations if migration.endswith(".py")]
-                    print(f"Running migrations: {python_migrations}")
-                    tasks = [run_migration(migration)
-                             for migration in python_migrations]
+                    migrate()
                 case _:
                     print("No Valid argument passed!")
     else:

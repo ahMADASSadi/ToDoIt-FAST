@@ -23,11 +23,11 @@ MIGRATIONS_PATH = BASE_DIR/"database"/"migrations"
 load_dotenv(BASE_DIR / ".env")
 
 # Database configuration from environment variables with defaults
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-DB_NAME = os.getenv("DB_NAME", "todoapp")
-COLLECTION_NAME = os.getenv("COLLECTION_NAME", "tasks")
+MONGO_URI = os.getenv("MONGO_URI",)
+REDIS_HOST = os.getenv("REDIS_HOST", )
+REDIS_PORT = int(os.getenv("REDIS_PORT", ))
+DB_NAME = os.getenv("DB_NAME", )
+COLLECTION_NAME = os.getenv("COLLECTION_NAME", )
 
 # Global variables for database clients
 mongo_client: Optional[AsyncIOMotorClient] = None
