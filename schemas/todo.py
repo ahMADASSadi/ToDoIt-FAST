@@ -18,9 +18,7 @@ class TaskBase(BaseModel):
 
     class Config:
         validate_by_name = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 class TaskResponse(TaskBase):
@@ -29,12 +27,11 @@ class TaskResponse(TaskBase):
     is_finished: bool
 
 
-class TaskCreate(TaskBase):
-    ...
+class TaskCreate(TaskBase): ...
 
 
 class TaskUpdate(TaskBase):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    priority: Optional[TaskPriority] = None
+    title: Optional[str] = None  # type: ignore
+    description: Optional[str] = None  # type: ignore
+    priority: Optional[TaskPriority] = None  # type: ignore
     is_finished: Optional[bool] = None

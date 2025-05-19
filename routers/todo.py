@@ -12,35 +12,36 @@ router = APIRouter(tags=["todo"])
 
 @router.get("/", response_model=List[TaskResponse])
 async def read_tasks(
-        priority: Optional[str] = Query(None),
-        complete: Optional[bool] = Query(None),
-        collection: AsyncIOMotorCollection = Depends(get_tasks_collection)):
+    priority: Optional[str] = Query(None),
+    complete: Optional[bool] = Query(None),
+    collection: AsyncIOMotorCollection = Depends(get_tasks_collection),
+):
     query = {}
     if complete is not None:
         query["is_finished"] = complete
     if priority:
-        query["priority"] = priority
+        query["priority"] = priority  # type: ignore
     tasks = [convert_id(task) async for task in collection.find(query)]
     return tasks
 
 
 @router.get("/{pk}", response_model=TaskResponse)
-async def read_task(pk: int,
-                    priority: Optional[str] = Query(None),
-                    complete: Optional[bool] = Query(None),
-                    collection: AsyncIOMotorCollection = Depends(get_tasks_collection)):
-
+async def read_task(
+    pk: int,
+    priority: Optional[str] = Query(None),
+    complete: Optional[bool] = Query(None),
+    collection: AsyncIOMotorCollection = Depends(get_tasks_collection),
+):
     query = {"pk": pk}
     if complete is not None:
         query["is_finished"] = complete
     if priority:
-        query["priority"] = priority
+        query["priority"] = priority  # type: ignore
 
     task = await collection.find_one(query)
 
     if not task:
-        raise HTTPException(
-            status_code=404, detail=f"Task with id {pk} not found")
+        raise HTTPException(status_code=404, detail=f"Task with id {pk} not found")
     return convert_id(task)
 
 
@@ -48,7 +49,7 @@ async def read_task(pk: int,
 async def update_task(
     pk: int,
     update_field: TaskUpdate,
-    collection: AsyncIOMotorCollection = Depends(get_tasks_collection)
+    collection: AsyncIOMotorCollection = Depends(get_tasks_collection),
 ):
     update_data = update_field.model_dump(exclude_unset=True)
     if not update_data:
@@ -59,22 +60,22 @@ async def update_task(
         raise HTTPException(status_code=404, detail="Task not found")
 
     updated_task = await collection.find_one({"pk": pk})
-    return convert_id(updated_task)
+    return convert_id(updated_task)  # type: ignore
 
 
 @router.delete("/{pk}")
-async def delete_task(pk: int, collection: AsyncIOMotorCollection = Depends(get_tasks_collection)):
+async def delete_task(
+    pk: int, collection: AsyncIOMotorCollection = Depends(get_tasks_collection)
+):
     result = await collection.delete_one({"pk": pk})
     if result.deleted_count == 0:
-        raise HTTPException(
-            status_code=404, detail=f"Task with id {pk} not found")
+        raise HTTPException(status_code=404, detail=f"Task with id {pk} not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/add", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 async def add_task(
-    task: TaskCreate,
-    collection: AsyncIOMotorCollection = Depends(get_tasks_collection)
+    task: TaskCreate, collection: AsyncIOMotorCollection = Depends(get_tasks_collection)
 ):
     next_pk = await get_next_pk(collection, "task_id")
     new_task_data = {
