@@ -11,7 +11,7 @@ async def get_next_pk(collection: AsyncIOMotorCollection, counter_name: str) -> 
         {"_id": counter_name},
         {"$inc": {"sequence_value": 1}},
         upsert=True,
-        return_document=True
+        return_document=True,
     )
     return counter["sequence_value"]
 
@@ -28,11 +28,10 @@ def convert_id(document: dict) -> dict:
 
 def run_migration(migration_file):
     # Construct full file path
-    migration_path = MIGRATIONS_PATH/migration_file
+    migration_path = MIGRATIONS_PATH / migration_file
 
     # Import the migration script dynamically
-    spec = importlib.util.spec_from_file_location(
-        migration_file, migration_path)
+    spec = importlib.util.spec_from_file_location(migration_file, migration_path)
 
     migration_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration_module)
@@ -53,7 +52,7 @@ def migrate():
     print(f"Found migrations: {migrations}")
 
     python_migrations = [
-        migration for migration in migrations if migration.endswith(".py")]
+        migration for migration in migrations if migration.endswith(".py")
+    ]
     print(f"Running migrations: {python_migrations}")
-    tasks = [run_migration(migration)
-             for migration in python_migrations]
+    (run_migration(migration) for migration in python_migrations)

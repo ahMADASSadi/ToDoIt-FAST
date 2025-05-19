@@ -8,26 +8,27 @@ import os
 
 from pymongo.errors import ConfigurationError, CollectionInvalid
 from motor.motor_asyncio import AsyncIOMotorClient
-from redis.asyncio import Redis
+from redis.asyncio import Redis  # noqa: F401
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Base directory and environment configuration
 BASE_DIR = Path(__file__).resolve().parent.parent
-MIGRATIONS_PATH = BASE_DIR/"database"/"migrations"
+MIGRATIONS_PATH = BASE_DIR / "database" / "migrations"
 load_dotenv(BASE_DIR / ".env")
 
 # Database configuration from environment variables with defaults
-MONGO_URI = os.getenv("MONGO_URI",)
-REDIS_HOST = os.getenv("REDIS_HOST", )
-REDIS_PORT = int(os.getenv("REDIS_PORT", ))
-DB_NAME = os.getenv("DB_NAME", )
-COLLECTION_NAME = os.getenv("COLLECTION_NAME", )
+MONGO_URI = os.getenv(
+    "MONGO_URI", "mongodb://localhost:27017/todoapp"
+)
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+DB_NAME = os.getenv("DB_NAME", "todoapp")
+COLLECTION_NAME = os.getenv("COLLECTION_NAME", "tasks")
 
 # Global variables for database clients
 mongo_client: Optional[AsyncIOMotorClient] = None
@@ -41,7 +42,7 @@ async def lifespan(app):
         # Initialize MongoDB connection
         mongo_client = AsyncIOMotorClient(
             MONGO_URI,
-            serverSelectionTimeoutMS=5000  # 5 second timeout
+            serverSelectionTimeoutMS=5000,  # 5 second timeout
         )
         await mongo_client.server_info()  # Test connection
         logger.info("✅ Successfully connected to MongoDB")

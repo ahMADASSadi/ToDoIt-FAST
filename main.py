@@ -11,6 +11,7 @@ app.include_router(todo_router, prefix="/tasks")
 if __name__ == "__main__":
     from uvicorn import run
     import sys
+
     if len(sys.argv) > 1:
         arguments = sys.argv[1:]
         for arg in arguments:
