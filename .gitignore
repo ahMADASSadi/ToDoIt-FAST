@@ -1,7 +1,11 @@
 __pycache__/
+.mypy_cache
+.ruff_cache
+.venv
 
 .env
 
+uv.lock
 poetry.lock
 
 API/
